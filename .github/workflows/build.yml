@@ -1,0 +1,103 @@
+name: Build — All Platforms
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: # allows manual trigger from the GitHub Actions tab
+
+jobs:
+  # ── Windows ────────────────────────────────────────────────────────────────
+  build-windows:
+    name: Build (Windows)
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Build executable
+        run: >
+          pyinstaller --onefile --windowed
+          --name "University_Timetable_Automation"
+          --collect-all pypdfium2
+          main.py
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: University_Timetable_Automation_Windows
+          path: dist/University_Timetable_Automation.exe
+          retention-days: 30
+
+  # ── macOS ──────────────────────────────────────────────────────────────────
+  build-macos:
+    name: Build (macOS)
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Build executable
+        run: >
+          pyinstaller --onefile --windowed
+          --name "University_Timetable_Automation"
+          --collect-all pypdfium2
+          main.py
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: University_Timetable_Automation_macOS
+          path: dist/University_Timetable_Automation
+          retention-days: 30
+
+  # ── Linux ──────────────────────────────────────────────────────────────────
+  build-linux:
+    name: Build (Linux)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y python3-tk
+          pip install -r requirements.txt
+
+      - name: Build executable
+        run: >
+          pyinstaller --onefile --windowed
+          --name "University_Timetable_Automation"
+          --collect-all pypdfium2
+          main.py
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: University_Timetable_Automation_Linux
+          path: dist/University_Timetable_Automation
+          retention-days: 30

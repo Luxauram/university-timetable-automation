@@ -1,0 +1,107 @@
+# ── Python ────────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+*.pyd
+
+# Ambienti virtuali
+venv/
+.venv/
+env/
+.env/
+ENV/
+
+# Distribuzione / packaging
+dist/
+build/
+*.egg-info/
+*.egg
+MANIFEST
+
+# PyInstaller
+*.spec
+dist/
+build/
+
+# pytest / coverage
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# mypy / type checkers
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pytype/
+
+# ── Editor: VS Code ───────────────────────────────────────────────────────────
+.vscode/
+*.code-workspace
+
+
+# ── Editor: JetBrains (PyCharm, IntelliJ, ecc.) ──────────────────────────────
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+
+# ── Editor: Sublime Text ─────────────────────────────────────────────────────
+*.sublime-project
+*.sublime-workspace
+
+
+# ── Editor: Vim / Neovim ─────────────────────────────────────────────────────
+*.swp
+*.swo
+*~
+.netrwhist
+Session.vim
+
+
+# ── Editor: Emacs ────────────────────────────────────────────────────────────
+*~
+\#*\#
+.\#*
+.dir-locals.el
+
+
+# ── macOS ─────────────────────────────────────────────────────────────────────
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.Spotlight-V100
+.Trashes
+.fseventsd
+.DocumentRevisions-V100
+.TemporaryItems
+
+
+# ── Windows ───────────────────────────────────────────────────────────────────
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+
+# ── Linux ─────────────────────────────────────────────────────────────────────
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+
+# ── File di log e temporanei ──────────────────────────────────────────────────
+*.log
+*.tmp
+*.temp
+tmp/
+temp/
