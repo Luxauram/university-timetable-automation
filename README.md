@@ -10,14 +10,14 @@ Currently configured for **Università del Molise** (Dipartimento di Bioscienze 
 
 Every push to `main` automatically builds the application for all three platforms via GitHub Actions. Download the latest version below:
 
-| Platform    | Download                                                                                                                                                                  |
-| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Windows** | [University_Timetable_Automation.exe](https://github.com/Luxauram/university-timetable-automation.git/releases/latest/download/University_Timetable_Automation.exe)       |
-| **macOS**   | [University_Timetable_Automation (macOS)](https://github.com/Luxauram/university-timetable-automation.git/releases/latest/download/University_Timetable_Automation_macOS) |
-| **Linux**   | [University_Timetable_Automation (Linux)](https://github.com/Luxauram/university-timetable-automation.git/releases/latest/download/University_Timetable_Automation_Linux) |
+| Platform    | Download                                                                                                                                                                        |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Windows** | [University_Timetable_Automation_Windows.exe](https://github.com/Luxauram/university-timetable-automation/releases/latest/download/University_Timetable_Automation_Windows.exe) |
+| **macOS**   | [University_Timetable_Automation_macOS](https://github.com/Luxauram/university-timetable-automation/releases/latest/download/University_Timetable_Automation_macOS)             |
+| **Linux**   | [University_Timetable_Automation_Linux](https://github.com/Luxauram/university-timetable-automation/releases/latest/download/University_Timetable_Automation_Linux)             |
 
 > No installation required — just download and run.
-> On macOS/Linux you may need to make the file executable first: `chmod +x University_Timetable_Automation`
+> On macOS/Linux make the file executable first: `chmod +x University_Timetable_Automation_macOS`
 
 ---
 

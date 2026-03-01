@@ -1,9 +1,12 @@
-name: Build — All Platforms
+name: Build and Release
 
 on:
   push:
     branches: [main]
-  workflow_dispatch: # allows manual trigger from the GitHub Actions tab
+  workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   # ── Windows ────────────────────────────────────────────────────────────────
@@ -33,9 +36,8 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: University_Timetable_Automation_Windows
+          name: windows-build
           path: dist/University_Timetable_Automation.exe
-          retention-days: 30
 
   # ── macOS ──────────────────────────────────────────────────────────────────
   build-macos:
@@ -64,9 +66,8 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: University_Timetable_Automation_macOS
+          name: macos-build
           path: dist/University_Timetable_Automation
-          retention-days: 30
 
   # ── Linux ──────────────────────────────────────────────────────────────────
   build-linux:
@@ -82,11 +83,13 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install dependencies
+      - name: Install system dependencies
         run: |
           sudo apt-get update -q
           sudo apt-get install -y python3-tk
-          pip install -r requirements.txt
+
+      - name: Install Python dependencies
+        run: pip install -r requirements.txt
 
       - name: Build executable
         run: >
@@ -98,6 +101,64 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: University_Timetable_Automation_Linux
+          name: linux-build
           path: dist/University_Timetable_Automation
-          retention-days: 30
+
+  # ── Release ────────────────────────────────────────────────────────────────
+  release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    needs: [build-windows, build-macos, build-linux]
+
+    steps:
+      - name: Download Windows build
+        uses: actions/download-artifact@v4
+        with:
+          name: windows-build
+          path: release/windows
+
+      - name: Download macOS build
+        uses: actions/download-artifact@v4
+        with:
+          name: macos-build
+          path: release/macos
+
+      - name: Download Linux build
+        uses: actions/download-artifact@v4
+        with:
+          name: linux-build
+          path: release/linux
+
+      - name: Rename binaries with platform suffix
+        run: |
+          mv release/windows/University_Timetable_Automation.exe \
+             release/University_Timetable_Automation_Windows.exe
+          mv release/macos/University_Timetable_Automation \
+             release/University_Timetable_Automation_macOS
+          mv release/linux/University_Timetable_Automation \
+             release/University_Timetable_Automation_Linux
+          chmod +x release/University_Timetable_Automation_macOS
+          chmod +x release/University_Timetable_Automation_Linux
+
+      - name: Create or update latest release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: latest
+          name: Latest Build
+          body: |
+            Automatically generated release from the latest commit on `main`.
+
+            | Platform | File |
+            |---|---|
+            | Windows | `University_Timetable_Automation_Windows.exe` |
+            | macOS   | `University_Timetable_Automation_macOS` |
+            | Linux   | `University_Timetable_Automation_Linux` |
+
+            > On macOS and Linux, make the file executable before running:
+            > `chmod +x University_Timetable_Automation_macOS`
+          prerelease: false
+          make_latest: true
+          files: |
+            release/University_Timetable_Automation_Windows.exe
+            release/University_Timetable_Automation_macOS
+            release/University_Timetable_Automation_Linux
