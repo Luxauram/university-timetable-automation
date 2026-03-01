@@ -144,11 +144,13 @@ class App(tk.Tk):
     def __init__(self) -> None:
         """
         Initialises the Tk root window, sets up ttk styles, and builds the UI.
+
+        Calls ``update_idletasks()`` after building the UI so that Tk finishes
+        computing all widget sizes before the window is shown. This prevents
+        the status bar and bottom bar from being clipped on the first render.
         """
         super().__init__()
         self.title(WINDOW_TITLE)
-        self.geometry(WINDOW_SIZE)
-        self.minsize(*WINDOW_MIN_SIZE)
         self.configure(bg=BG)
 
         self.pdf_links: list[dict] = []
@@ -158,6 +160,12 @@ class App(tk.Tk):
 
         self._setup_styles()
         self._build_ui()
+
+        # Let Tk finish computing all widget sizes, then enforce geometry.
+        # This ensures the status bar is never clipped on startup.
+        self.update_idletasks()
+        self.geometry(WINDOW_SIZE)
+        self.minsize(*WINDOW_MIN_SIZE)
 
     # ── Style setup ───────────────────────────────────────────────────────────
 
@@ -191,7 +199,11 @@ class App(tk.Tk):
         )
 
         style.configure(
-            "TScrollbar", background=BG_ALT, troughcolor=SURFACE, borderwidth=0, arrowsize=14
+            "TScrollbar",
+            background=BG_ALT,
+            troughcolor=SURFACE,
+            borderwidth=0,
+            arrowsize=14,
         )
 
         for name, palette in (
@@ -363,10 +375,18 @@ class App(tk.Tk):
         hdr = tk.Frame(self, bg=HEADER_BG, pady=20)
         hdr.pack(fill="x")
         tk.Label(
-            hdr, text=HEADER_TITLE, font=(FONT, FONT_LARGE, "bold"), bg=HEADER_BG, fg=HEADER_FG
+            hdr,
+            text=HEADER_TITLE,
+            font=(FONT, FONT_LARGE, "bold"),
+            bg=HEADER_BG,
+            fg=HEADER_FG,
         ).pack()
         tk.Label(
-            hdr, text=HEADER_SUBTITLE, font=(FONT, FONT_SMALL), bg=HEADER_BG, fg=HEADER_SUB
+            hdr,
+            text=HEADER_SUBTITLE,
+            font=(FONT, FONT_SMALL),
+            bg=HEADER_BG,
+            fg=HEADER_SUB,
         ).pack(pady=(3, 0))
 
     def _build_card_corso(self, parent: tk.Widget) -> None:
@@ -477,7 +497,8 @@ class App(tk.Tk):
         self.scroll_frame = tk.Frame(self._canvas, bg=SURFACE)
 
         self.scroll_frame.bind(
-            "<Configure>", lambda _: self._canvas.configure(scrollregion=self._canvas.bbox("all"))
+            "<Configure>",
+            lambda _: self._canvas.configure(scrollregion=self._canvas.bbox("all")),
         )
 
         self._canvas.create_window((0, 0), window=self.scroll_frame, anchor="nw")
@@ -486,13 +507,17 @@ class App(tk.Tk):
         scrollbar.pack(side="right", fill="y")
 
         self._canvas.bind_all(
-            "<MouseWheel>", lambda e: self._canvas.yview_scroll(int(-1 * (e.delta / 120)), "units")
+            "<MouseWheel>",
+            lambda e: self._canvas.yview_scroll(int(-1 * (e.delta / 120)), "units"),
         )
         self._canvas.bind_all("<Button-4>", lambda _: self._canvas.yview_scroll(-1, "units"))
         self._canvas.bind_all("<Button-5>", lambda _: self._canvas.yview_scroll(1, "units"))
 
         self._label(
-            self.scroll_frame, 'Seleziona un corso e premi "Carica orari"', dim=True, bg=SURFACE
+            self.scroll_frame,
+            'Seleziona un corso e premi "Carica orari"',
+            dim=True,
+            bg=SURFACE,
         ).pack(pady=30)
 
     def _build_bottom_bar(self) -> None:
@@ -610,7 +635,7 @@ class App(tk.Tk):
     def _on_carica(self) -> None:
         """
         Reads the selected course from the combobox, resolves its URL from
-        CORSI (config.py), and starts a background thread to scrape PDF links.
+        CORSI (courses.py), and starts a background thread to scrape PDF links.
         Shows an error dialog if the course key is not found in CORSI.
         """
         corso = self.corso_var.get()
@@ -682,7 +707,9 @@ class App(tk.Tk):
         self.progress["value"] = 0
 
         threading.Thread(
-            target=self._thread_scarica, args=(selected, pdf_dir, pptx_dir, do_convert), daemon=True
+            target=self._thread_scarica,
+            args=(selected, pdf_dir, pptx_dir, do_convert),
+            daemon=True,
         ).start()
 
     # ── Background threads ────────────────────────────────────────────────────

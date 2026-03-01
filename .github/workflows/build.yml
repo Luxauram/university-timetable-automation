@@ -31,6 +31,8 @@ jobs:
           pyinstaller --onefile --windowed
           --name "University_Timetable_Automation"
           --collect-all pypdfium2
+          --add-data "icon.png;."
+          --icon icon.ico
           main.py
 
       - name: Upload artifact
@@ -61,6 +63,7 @@ jobs:
           pyinstaller --onefile --windowed
           --name "University_Timetable_Automation"
           --collect-all pypdfium2
+          --add-data "icon.png:."
           main.py
 
       - name: Upload artifact
@@ -96,6 +99,7 @@ jobs:
           pyinstaller --onefile --windowed
           --name "University_Timetable_Automation"
           --collect-all pypdfium2
+          --add-data "icon.png:."
           main.py
 
       - name: Upload artifact

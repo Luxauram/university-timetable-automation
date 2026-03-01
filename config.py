@@ -6,8 +6,6 @@ network settings, and PDF-to-PPTX rendering parameters.
 
 To add or modify courses, edit courses.py instead — this file
 intentionally contains no course or university-specific data.
-
-License: MIT
 """
 
 import sys
@@ -93,10 +91,11 @@ FONT_LARGE = 22
 
 
 # ── Window geometry ───────────────────────────────────────────────────────────
+# Increased height to ensure the status bar is never clipped on first render.
 
 WINDOW_TITLE = "University Timetable Automation"
-WINDOW_SIZE = "980x820"
-WINDOW_MIN_SIZE = (820, 700)
+WINDOW_SIZE = "980x900"
+WINDOW_MIN_SIZE = (820, 780)
 
 
 # ── PDF → PPTX rendering ─────────────────────────────────────────────────────
