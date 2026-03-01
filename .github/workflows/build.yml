@@ -26,6 +26,16 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
+      - name: Generate multi-size icon.ico from icon.png
+        run: |
+          python -c "
+          from PIL import Image
+          img = Image.open('icon.png').convert('RGBA')
+          sizes = [(16,16),(32,32),(48,48),(64,64),(128,128),(256,256)]
+          img.save('icon.ico', format='ICO', sizes=sizes)
+          print('icon.ico generated OK')
+          "
+
       - name: Build executable
         run: >
           pyinstaller --onefile --windowed
