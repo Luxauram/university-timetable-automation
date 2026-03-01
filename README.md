@@ -12,9 +12,9 @@ Every push to `main` automatically builds the application for all three platform
 
 | Platform    | Download                                                                                                                                                                  |
 | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Windows** | [University_Timetable_Automation.exe](https://github.com/lucadaurizio/university-timetable-automation/releases/latest/download/University_Timetable_Automation.exe)       |
-| **macOS**   | [University_Timetable_Automation (macOS)](https://github.com/lucadaurizio/university-timetable-automation/releases/latest/download/University_Timetable_Automation_macOS) |
-| **Linux**   | [University_Timetable_Automation (Linux)](https://github.com/lucadaurizio/university-timetable-automation/releases/latest/download/University_Timetable_Automation_Linux) |
+| **Windows** | [University_Timetable_Automation.exe](https://github.com/Luxauram/university-timetable-automation.git/releases/latest/download/University_Timetable_Automation.exe)       |
+| **macOS**   | [University_Timetable_Automation (macOS)](https://github.com/Luxauram/university-timetable-automation.git/releases/latest/download/University_Timetable_Automation_macOS) |
+| **Linux**   | [University_Timetable_Automation (Linux)](https://github.com/Luxauram/university-timetable-automation.git/releases/latest/download/University_Timetable_Automation_Linux) |
 
 > No installation required — just download and run.
 > On macOS/Linux you may need to make the file executable first: `chmod +x University_Timetable_Automation`
@@ -56,7 +56,7 @@ Every push to `main` automatically builds the application for all three platform
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/lucadaurizio/university-timetable-automation.git
+git clone https://github.com/Luxauram/university-timetable-automation.git
 cd university-timetable-automation
 
 # 2. Create and activate a virtual environment (recommended)
