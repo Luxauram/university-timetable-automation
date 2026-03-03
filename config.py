@@ -18,7 +18,7 @@ from courses import CORSI, BASE_STRAPI
 
 # ── Application identity ──────────────────────────────────────────────────────
 
-APP_VERSION: str = "1.0.0"
+APP_VERSION: str = "1.0.1"
 GITHUB_REPO: str = "https://github.com/Luxauram/university-timetable-automation"
 AUTHOR: str = "Luxauram"
 
@@ -83,7 +83,6 @@ HEADER_SUB = "#90b4d0"
 
 
 # ── Button colours ────────────────────────────────────────────────────────────
-# Each tuple: (normal background, hover background, foreground text)
 
 BTN_CONFIRM = ("#2d9e5f", "#237a4a", "#ffffff")
 BTN_CANCEL = ("#d63b3b", "#b02e2e", "#ffffff")

@@ -164,6 +164,8 @@ class App(tk.Tk):
         self._setup_styles()
         self._build_ui()
 
+        # Let Tk finish computing all widget sizes, then enforce geometry.
+        # This ensures the status bar is never clipped on startup.
         self.update_idletasks()
         self.geometry(WINDOW_SIZE)
         self.minsize(*WINDOW_MIN_SIZE)
@@ -1200,12 +1202,19 @@ class App(tk.Tk):
         import webbrowser
 
         api_url = (
-            f"https://api.github.com/repos/Luxauram/university-timetable-automation/releases/latest"
+            "https://api.github.com/repos/Luxauram/university-timetable-automation/releases/latest"
         )
         try:
             resp = requests.get(api_url, timeout=10, headers={"User-Agent": USER_AGENT})
+            if resp.status_code == 404:
+                self.after(0, self._show_update_result, APP_VERSION)
+                return
             resp.raise_for_status()
-            latest = resp.json().get("tag_name", "").lstrip("v")
+            import re as _re
+
+            tag = resp.json().get("tag_name", "").strip()
+            m = _re.match(r"v?(\d+\.\d+\.\d+)", tag)
+            latest = m.group(1) if m else APP_VERSION
             self.after(0, self._show_update_result, latest)
         except Exception:
             self.after(0, self._show_update_error)
@@ -1224,7 +1233,15 @@ class App(tk.Tk):
 
         self._set_status(t("status_ready", lang))
 
-        if latest and latest != current:
+        def _parse_ver(v):
+            import re as _re2
+
+            m = _re2.match(r"([0-9]+)[.]([0-9]+)[.]([0-9]+)", v or "")
+            return tuple(int(x) for x in m.groups()) if m else (0, 0, 0)
+
+        is_newer = _parse_ver(latest) > _parse_ver(current)
+
+        if is_newer:
             msg = t("update_available", lang, latest=latest, current=current)
             dlg = tk.Toplevel(self)
             dlg.title(t("update_title", lang))
