@@ -6,12 +6,21 @@ network settings, and PDF-to-PPTX rendering parameters.
 
 To add or modify courses, edit courses.py instead — this file
 intentionally contains no course or university-specific data.
+
+License: MIT
 """
 
 import sys
 from pathlib import Path
 
 from courses import CORSI, BASE_STRAPI
+
+
+# ── Application identity ──────────────────────────────────────────────────────
+
+APP_VERSION: str = "1.0.0"
+GITHUB_REPO: str = "https://github.com/Luxauram/university-timetable-automation"
+AUTHOR: str = "Luxauram"
 
 
 # ── Network ───────────────────────────────────────────────────────────────────
@@ -91,7 +100,6 @@ FONT_LARGE = 22
 
 
 # ── Window geometry ───────────────────────────────────────────────────────────
-# Increased height to ensure the status bar is never clipped on first render.
 
 WINDOW_TITLE = "University Timetable Automation"
 WINDOW_SIZE = "980x900"

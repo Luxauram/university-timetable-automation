@@ -26,7 +26,6 @@ License: MIT
 """
 
 # Base URL of the Strapi media server used to host the PDF files.
-# Change this if your university uses a different backend.
 BASE_STRAPI = "https://apistrapi.unimol.it"
 
 # Course registry.

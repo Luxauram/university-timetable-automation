@@ -59,6 +59,9 @@ from config import (
 )
 from scraper import scrape_pdf_links
 from converter import pdf_to_pptx
+from i18n import t
+from settings import settings
+from config import APP_VERSION, GITHUB_REPO, AUTHOR
 
 
 # ── Module-level helpers ───────────────────────────────────────────────────────
@@ -156,13 +159,11 @@ class App(tk.Tk):
         self.pdf_links: list[dict] = []
         self.check_vars: list[tk.BooleanVar] = []
         self.dest_dir = tk.StringVar(value=DEFAULT_DEST)
-        self.convert_var = tk.BooleanVar(value=True)
+        self.convert_var = tk.BooleanVar(value=settings.pptx_default_on)
 
         self._setup_styles()
         self._build_ui()
 
-        # Let Tk finish computing all widget sizes, then enforce geometry.
-        # This ensures the status bar is never clipped on startup.
         self.update_idletasks()
         self.geometry(WINDOW_SIZE)
         self.minsize(*WINDOW_MIN_SIZE)
@@ -355,6 +356,7 @@ class App(tk.Tk):
         """
         Constructs the full window layout by composing the individual sections.
         """
+        self._build_menubar()
         self._build_header()
         outer = tk.Frame(self, bg=BG)
         outer.pack(fill="both", expand=True, padx=20, pady=14)
@@ -364,26 +366,68 @@ class App(tk.Tk):
         self._build_bottom_bar()
         self._build_status_bar()
 
+    def _build_menubar(self) -> None:
+        """
+        Builds the native OS menu bar with File, Impostazioni, Aggiornamenti
+        and Info menus.
+        """
+        lang = settings.language
+        menubar = tk.Menu(self)
+
+        # ── File ──────────────────────────────────────────────────────────────
+        file_menu = tk.Menu(menubar, tearoff=0)
+        file_menu.add_command(
+            label=t("menu_file_open_folder", lang),
+            command=self._on_menu_open_folder,
+        )
+        file_menu.add_separator()
+        file_menu.add_command(label=t("menu_file_exit", lang), command=self.quit)
+        menubar.add_cascade(label=t("menu_file", lang), menu=file_menu)
+
+        # ── Impostazioni ──────────────────────────────────────────────────────
+        settings_menu = tk.Menu(menubar, tearoff=0)
+        settings_menu.add_command(
+            label=t("menu_settings_title", lang),
+            command=self._on_menu_settings,
+        )
+        menubar.add_cascade(label=t("menu_settings", lang), menu=settings_menu)
+
+        # ── Aggiornamenti ─────────────────────────────────────────────────────
+        update_menu = tk.Menu(menubar, tearoff=0)
+        update_menu.add_command(
+            label=t("menu_updates_check", lang),
+            command=self._on_menu_check_updates,
+        )
+        menubar.add_cascade(label=t("menu_updates", lang), menu=update_menu)
+
+        # ── Info ──────────────────────────────────────────────────────────────
+        info_menu = tk.Menu(menubar, tearoff=0)
+        info_menu.add_command(
+            label=t("info_title", lang),
+            command=self._on_menu_info,
+        )
+        menubar.add_cascade(label=t("menu_info", lang), menu=info_menu)
+
+        self.config(menu=menubar)
+
     def _build_header(self) -> None:
         """
-        Builds the dark top banner with the application title and subtitle.
-        Title and subtitle text are read from config.py (HEADER_TITLE,
-        HEADER_SUBTITLE) so they can be changed without touching this file.
+        Builds the dark top banner with the application title and subtitle,
+        using the active language from settings.
         """
-        from config import HEADER_TITLE, HEADER_SUBTITLE
-
+        lang = settings.language
         hdr = tk.Frame(self, bg=HEADER_BG, pady=20)
         hdr.pack(fill="x")
         tk.Label(
             hdr,
-            text=HEADER_TITLE,
+            text=t("header_title", lang),
             font=(FONT, FONT_LARGE, "bold"),
             bg=HEADER_BG,
             fg=HEADER_FG,
         ).pack()
         tk.Label(
             hdr,
-            text=HEADER_SUBTITLE,
+            text=t("header_subtitle", lang),
             font=(FONT, FONT_SMALL),
             bg=HEADER_BG,
             fg=HEADER_SUB,
@@ -398,11 +442,12 @@ class App(tk.Tk):
 
         @param parent: Container widget to pack the card into.
         """
+        lang = settings.language
         card = self._card(parent, pady=16, padx=18)
         card.pack(fill="x", pady=(0, 10))
         card.columnconfigure(1, weight=1)
 
-        self._label(card, "Corso di laurea", bold=True, bg=SURFACE).grid(
+        self._label(card, t("label_corso", lang), bold=True, bg=SURFACE).grid(
             row=0, column=0, sticky="w", padx=(0, 12), pady=(0, 6)
         )
         self.corso_var = tk.StringVar(value=list(CORSI.keys())[0])
@@ -414,24 +459,26 @@ class App(tk.Tk):
             font=(FONT, FONT_SIZE),
             width=50,
         ).grid(row=0, column=1, sticky="ew", padx=(0, 12), pady=(0, 6))
-        self._btn(card, "Carica orari", self._on_carica, kind="info").grid(
+        self._btn(card, t("btn_carica", lang), self._on_carica, kind="info").grid(
             row=0, column=2, pady=(0, 6)
         )
 
-        self._label(card, "Salva in:", dim=True, bg=SURFACE).grid(
+        self._label(card, t("label_salva_in", lang), dim=True, bg=SURFACE).grid(
             row=1, column=0, sticky="w", padx=(0, 12), pady=4
         )
         self._entry(card, self.dest_dir, width=50, bg=BG_ALT).grid(
             row=1, column=1, sticky="ew", padx=(0, 12), pady=4
         )
-        self._btn(card, "Sfoglia...", self._on_sfoglia, kind="info").grid(row=1, column=2, pady=4)
+        self._btn(card, t("btn_sfoglia", lang), self._on_sfoglia, kind="info").grid(
+            row=1, column=2, pady=4
+        )
 
         conv_frame = tk.Frame(card, bg=SURFACE)
         conv_frame.grid(row=2, column=0, columnspan=3, sticky="w", pady=(8, 0))
         tk.Checkbutton(
             conv_frame,
             variable=self.convert_var,
-            text="  Converti automaticamente i PDF in PowerPoint (.pptx)",
+            text=t("check_convert_pptx", lang),
             font=(FONT, FONT_SMALL),
             bg=SURFACE,
             fg=TEXT,
@@ -449,13 +496,14 @@ class App(tk.Tk):
 
         @param parent: Container widget to pack the card into.
         """
+        lang = settings.language
         card = self._card(parent, pady=12, padx=18)
         card.pack(fill="x", pady=(0, 10))
 
-        self._label(card, "Aggiungi PDF da link esterno", bold=True, bg=SURFACE).pack(anchor="w")
+        self._label(card, t("card_link_title", lang), bold=True, bg=SURFACE).pack(anchor="w")
         self._label(
             card,
-            "Incolla un URL diretto a un PDF per aggiungerlo alla lista",
+            t("card_link_subtitle", lang),
             size=FONT_SMALL,
             dim=True,
             bg=SURFACE,
@@ -467,11 +515,11 @@ class App(tk.Tk):
         self.ext_url_var = tk.StringVar()
         self.ext_label_var = tk.StringVar()
 
-        self._label(row, "URL:", bg=SURFACE).pack(side="left")
+        self._label(row, t("label_url", lang), bg=SURFACE).pack(side="left")
         self._entry(row, self.ext_url_var, width=44, bg=BG_ALT).pack(side="left", padx=(6, 16))
-        self._label(row, "Nome:", bg=SURFACE).pack(side="left")
+        self._label(row, t("label_nome", lang), bg=SURFACE).pack(side="left")
         self._entry(row, self.ext_label_var, width=18, bg=BG_ALT).pack(side="left", padx=6)
-        self._btn(row, "Aggiungi", self._on_aggiungi_link, kind="confirm").pack(
+        self._btn(row, t("btn_aggiungi", lang), self._on_aggiungi_link, kind="confirm").pack(
             side="left", padx=(10, 0)
         )
 
@@ -484,10 +532,11 @@ class App(tk.Tk):
 
         @param parent: Container widget to pack the card into.
         """
+        lang = settings.language
         card = self._card(parent, pady=12, padx=18)
         card.pack(fill="both", expand=True)
 
-        self._label(card, "PDF disponibili", bold=True, bg=SURFACE).pack(anchor="w")
+        self._label(card, t("card_lista_title", lang), bold=True, bg=SURFACE).pack(anchor="w")
 
         border = tk.Frame(card, bg=BORDER, bd=1)
         border.pack(fill="both", expand=True, pady=(8, 0))
@@ -515,7 +564,7 @@ class App(tk.Tk):
 
         self._label(
             self.scroll_frame,
-            'Seleziona un corso e premi "Carica orari"',
+            t("lista_placeholder", settings.language),
             dim=True,
             bg=SURFACE,
         ).pack(pady=30)
@@ -527,19 +576,22 @@ class App(tk.Tk):
         Left side: "Seleziona tutti" (green) and "Deseleziona tutti" (red).
         Right side: "Scarica PDF selezionati" (green, prominent).
         """
+        lang = settings.language
         bar = tk.Frame(self, bg=BG, pady=14, padx=20)
         bar.pack(fill="x")
 
         left = tk.Frame(bar, bg=BG)
         left.pack(side="left")
-        self._btn(left, "Seleziona tutti", self._on_select_all, kind="confirm").pack(
+        self._btn(left, t("btn_select_all", lang), self._on_select_all, kind="confirm").pack(
             side="left", padx=(0, 10)
         )
-        self._btn(left, "Deseleziona tutti", self._on_deselect_all, kind="cancel").pack(side="left")
+        self._btn(left, t("btn_deselect_all", lang), self._on_deselect_all, kind="cancel").pack(
+            side="left"
+        )
 
         right = tk.Frame(bar, bg=BG)
         right.pack(side="right")
-        self._btn(right, "⬇   Scarica PDF selezionati", self._on_scarica, kind="confirm").pack(
+        self._btn(right, t("btn_scarica", lang), self._on_scarica, kind="confirm").pack(
             side="right"
         )
 
@@ -553,7 +605,7 @@ class App(tk.Tk):
         )
         self.progress.pack(fill="x")
 
-        self.status_var = tk.StringVar(value="Pronto.")
+        self.status_var = tk.StringVar(value=t("status_ready", settings.language))
         tk.Label(
             self,
             textvariable=self.status_var,
@@ -599,7 +651,7 @@ class App(tk.Tk):
                 highlightthickness=0,
             ).pack(side="left", padx=(10, 2), pady=8)
 
-            tag = "  [Link esterno]" if item.get("external") else ""
+            tag = t("tag_external", settings.language) if item.get("external") else ""
             tk.Label(
                 row,
                 text=item["label"] + tag,
@@ -618,7 +670,7 @@ class App(tk.Tk):
         Opens a native directory chooser dialog and updates ``dest_dir``
         with the selected path. Does nothing if the user cancels.
         """
-        directory = filedialog.askdirectory(title="Scegli cartella di destinazione")
+        directory = filedialog.askdirectory(title=t("dlg_browse_title", settings.language))
         if directory:
             self.dest_dir.set(directory)
 
@@ -641,9 +693,11 @@ class App(tk.Tk):
         corso = self.corso_var.get()
         url = CORSI.get(corso)
         if not url:
-            messagebox.showerror("Errore", "Corso non trovato nella configurazione.")
+            messagebox.showerror(
+                t("dlg_error", settings.language), t("msg_no_course", settings.language)
+            )
             return
-        self._set_status(f"Caricamento orari per {corso}...")
+        self._set_status(t("msg_loading", settings.language, corso=corso))
         self.update_idletasks()
         threading.Thread(target=self._thread_carica, args=(url,), daemon=True).start()
 
@@ -661,14 +715,18 @@ class App(tk.Tk):
         label = self.ext_label_var.get().strip()
 
         if not url:
-            messagebox.showwarning("Campo vuoto", "Inserisci un URL.")
+            messagebox.showwarning(
+                t("dlg_empty_field", settings.language), t("msg_empty_url", settings.language)
+            )
             return
         if not url.lower().startswith("http"):
-            messagebox.showwarning("URL non valido", "L'URL deve iniziare con http:// o https://")
+            messagebox.showwarning(
+                t("dlg_invalid_url", settings.language), t("msg_invalid_url", settings.language)
+            )
             return
         if url.lower().endswith(".pdf.pdf"):
             messagebox.showwarning(
-                "File non valido", "Il link termina con .pdf.pdf — file non valido."
+                t("dlg_invalid_file", settings.language), t("msg_double_pdf", settings.language)
             )
             return
 
@@ -680,7 +738,7 @@ class App(tk.Tk):
         self._render_lista()
         self.ext_url_var.set("")
         self.ext_label_var.set("")
-        self._set_status(f"Link esterno aggiunto: {label}")
+        self._set_status(t("msg_link_added", settings.language, label=label))
 
     def _on_scarica(self) -> None:
         """
@@ -690,7 +748,10 @@ class App(tk.Tk):
         """
         selected = [self.pdf_links[i] for i, var in enumerate(self.check_vars) if var.get()]
         if not selected:
-            messagebox.showinfo("Niente da scaricare", "Seleziona almeno un PDF dalla lista.")
+            messagebox.showinfo(
+                t("dlg_nothing_to_download", settings.language),
+                t("msg_nothing_selected", settings.language),
+            )
             return
 
         dest = self.dest_dir.get()
@@ -702,7 +763,7 @@ class App(tk.Tk):
         if do_convert:
             os.makedirs(pptx_dir, exist_ok=True)
 
-        self._set_status(f"Download in corso... (0/{len(selected)})")
+        self._set_status(t("msg_downloading", settings.language, n=len(selected)))
         self.progress["maximum"] = len(selected)
         self.progress["value"] = 0
 
@@ -725,7 +786,7 @@ class App(tk.Tk):
             links = scrape_pdf_links(url)
             self.after(0, self._on_links_caricati, links)
         except Exception as exc:
-            self.after(0, self._set_status, f"Errore caricamento: {exc}")
+            self.after(0, self._set_status, t("msg_load_error", settings.language, err=str(exc)))
 
     def _thread_scarica(
         self, items: list[dict], pdf_dir: str, pptx_dir: str, do_convert: bool
@@ -766,7 +827,11 @@ class App(tk.Tk):
                 ok += 1
 
                 if do_convert:
-                    self.after(0, self._set_status, f"Conversione: {os.path.basename(filepath)}...")
+                    self.after(
+                        0,
+                        self._set_status,
+                        t("msg_converting", settings.language, filename=os.path.basename(filepath)),
+                    )
                     pptx_path = _unique_path(pptx_dir, _sanitize_filename(label) + ".pptx")
                     if pdf_to_pptx(filepath, pptx_path):
                         conv_ok += 1
@@ -798,14 +863,14 @@ class App(tk.Tk):
 
         if not links:
             self._label(
-                self.scroll_frame, "Nessun PDF trovato per questo corso.", dim=True, bg=SURFACE
+                self.scroll_frame, t("msg_no_pdfs", settings.language), dim=True, bg=SURFACE
             ).pack(pady=20)
-            self._set_status("Nessun PDF trovato.")
+            self._set_status(t("msg_no_pdfs", settings.language))
             return
 
         self.pdf_links = list(links)
         self._render_lista()
-        self._set_status(f"Trovati {len(links)} PDF. Seleziona quelli da scaricare.")
+        self._set_status(t("msg_found_pdfs", settings.language, n=len(links)))
 
     def _update_progress(self, current: int, total: int, ok: int, err: int) -> None:
         """
@@ -818,7 +883,9 @@ class App(tk.Tk):
         @param err:     Number of files that failed.
         """
         self.progress["value"] = current
-        self._set_status(f"Download: {current}/{total}   OK: {ok}   Errori: {err}")
+        self._set_status(
+            t("msg_progress", settings.language, current=current, total=total, ok=ok, err=err)
+        )
 
     def _on_download_done(
         self,
@@ -844,22 +911,23 @@ class App(tk.Tk):
         """
         self.progress["value"] = 0
 
-        lines = [f"Download completato!\n{ok} PDF salvati in: {pdf_dir}"]
+        lines = [t("msg_summary_pdfs", settings.language, ok=ok, path=pdf_dir)]
         if err:
-            lines.append(f"{err} file non scaricati")
+            lines.append(t("msg_summary_errors", settings.language, err=err))
         if do_convert:
-            lines.append(f"\n{conv_ok} PPTX salvati in: {pptx_dir}")
+            lines.append(t("msg_summary_pptx", settings.language, conv_ok=conv_ok, path=pptx_dir))
             if conv_err:
-                lines.append(f"{conv_err} conversioni fallite")
+                lines.append(t("msg_summary_pptx_errors", settings.language, conv_err=conv_err))
 
-        messagebox.showinfo("Completato", "\n".join(lines))
+        messagebox.showinfo(t("msg_summary_title", settings.language), "\n".join(lines))
         self._set_status(
-            f"Completato — {ok} PDF, {conv_ok} PPTX"
+            t("msg_done_pptx", settings.language, ok=ok, conv_ok=conv_ok)
             if do_convert
-            else f"Completato — {ok} PDF scaricati"
+            else t("msg_done_pdf", settings.language, ok=ok)
         )
 
-        _open_folder(os.path.dirname(pdf_dir))
+        if settings.open_folder:
+            _open_folder(os.path.dirname(pdf_dir))
 
     def _set_status(self, message: str) -> None:
         """
@@ -868,6 +936,330 @@ class App(tk.Tk):
         @param message: Message string to display.
         """
         self.status_var.set(message)
+
+    # ── Menu handlers ─────────────────────────────────────────────────────────
+
+    def _rebuild_ui(self) -> None:
+        """
+        Destroys and rebuilds the entire window UI in-place.
+
+        Called when the user saves settings with a changed language so that
+        all widget labels are immediately re-rendered in the new language
+        without requiring an app restart.
+
+        Application state (pdf_links, dest_dir, convert_var) is preserved
+        across the rebuild so the user does not lose their current session.
+        """
+        saved_pdf_links = list(self.pdf_links)
+        saved_dest = self.dest_dir.get()
+        saved_convert = self.convert_var.get()
+
+        for widget in self.winfo_children():
+            widget.destroy()
+
+        self.pdf_links = saved_pdf_links
+        self.check_vars = []
+        self.dest_dir = tk.StringVar(value=saved_dest)
+        self.convert_var = tk.BooleanVar(value=saved_convert)
+
+        self._build_ui()
+        self.update_idletasks()
+
+        if self.pdf_links:
+            self._render_lista()
+
+        self._set_status(t("settings_saved", settings.language))
+
+    def _on_menu_open_folder(self) -> None:
+        """Opens the current destination folder in the OS file manager."""
+        _open_folder(self.dest_dir.get())
+
+    def _on_menu_settings(self) -> None:
+        """
+        Opens the Settings dialog. Applies and persists changes on save,
+        then rebuilds the UI if the language has changed.
+        """
+        import tkinter.font as tkfont
+
+        lang = settings.language
+
+        dlg = tk.Toplevel(self)
+        dlg.title(t("menu_settings_title", lang))
+        dlg.resizable(False, False)
+        dlg.configure(bg=BG)
+        dlg.grab_set()
+
+        pad = {"padx": 20, "pady": 8}
+
+        # PPTX default on
+        pptx_var = tk.BooleanVar(value=settings.pptx_default_on)
+        tk.Checkbutton(
+            dlg,
+            variable=pptx_var,
+            text=t("settings_pptx_default", lang),
+            font=(FONT, FONT_SIZE),
+            bg=BG,
+            fg=TEXT,
+            selectcolor=BG,
+            activebackground=BG,
+            relief="flat",
+            highlightthickness=0,
+        ).pack(anchor="w", **pad)
+
+        # Open folder after download
+        folder_var = tk.BooleanVar(value=settings.open_folder)
+        tk.Checkbutton(
+            dlg,
+            variable=folder_var,
+            text=t("settings_open_folder", lang),
+            font=(FONT, FONT_SIZE),
+            bg=BG,
+            fg=TEXT,
+            selectcolor=BG,
+            activebackground=BG,
+            relief="flat",
+            highlightthickness=0,
+        ).pack(anchor="w", **pad)
+
+        # PPTX quality
+        tk.Label(
+            dlg,
+            text=t("settings_quality", lang),
+            font=(FONT, FONT_SIZE, "bold"),
+            bg=BG,
+            fg=TEXT,
+        ).pack(anchor="w", padx=20, pady=(12, 2))
+
+        quality_var = tk.StringVar(value=settings.pptx_quality)
+        for val, label_key in (
+            ("low", "settings_quality_low"),
+            ("medium", "settings_quality_medium"),
+            ("high", "settings_quality_high"),
+        ):
+            tk.Radiobutton(
+                dlg,
+                variable=quality_var,
+                value=val,
+                text=t(label_key, lang),
+                font=(FONT, FONT_SMALL),
+                bg=BG,
+                fg=TEXT,
+                selectcolor=BG,
+                activebackground=BG,
+                relief="flat",
+                highlightthickness=0,
+            ).pack(anchor="w", padx=36, pady=2)
+
+        # Language
+        tk.Label(
+            dlg,
+            text=t("settings_language", lang),
+            font=(FONT, FONT_SIZE, "bold"),
+            bg=BG,
+            fg=TEXT,
+        ).pack(anchor="w", padx=20, pady=(12, 2))
+
+        lang_var = tk.StringVar(value=settings.language)
+        for val, label in (("it", "Italiano"), ("en", "English")):
+            tk.Radiobutton(
+                dlg,
+                variable=lang_var,
+                value=val,
+                text=label,
+                font=(FONT, FONT_SMALL),
+                bg=BG,
+                fg=TEXT,
+                selectcolor=BG,
+                activebackground=BG,
+                relief="flat",
+                highlightthickness=0,
+            ).pack(anchor="w", padx=36, pady=2)
+
+        tk.Frame(dlg, bg=BORDER, height=1).pack(fill="x", padx=20, pady=12)
+
+        btn_row = tk.Frame(dlg, bg=BG)
+        btn_row.pack(fill="x", padx=20, pady=(0, 16))
+
+        def _save():
+            lang_changed = lang_var.get() != settings.language
+            settings.set("pptx_default_on", pptx_var.get())
+            settings.set("open_folder", folder_var.get())
+            settings.set("pptx_quality", quality_var.get())
+            settings.set("language", lang_var.get())
+            settings.save()
+            dlg.destroy()
+            if lang_changed:
+                self._rebuild_ui()
+            else:
+                self._set_status(t("settings_saved", settings.language))
+
+        ttk.Button(
+            btn_row,
+            text=t("settings_save", lang),
+            style="Confirm.TButton",
+            command=_save,
+            cursor="hand2",
+        ).pack(side="right", padx=(8, 0))
+        ttk.Button(
+            btn_row,
+            text=t("settings_cancel", lang),
+            style="Cancel.TButton",
+            command=dlg.destroy,
+            cursor="hand2",
+        ).pack(side="right")
+
+    def _on_menu_info(self) -> None:
+        """
+        Opens the About dialog showing version, author, license and a
+        clickable GitHub link.
+        """
+        import webbrowser
+
+        lang = settings.language
+
+        dlg = tk.Toplevel(self)
+        dlg.title(t("info_title", lang))
+        dlg.resizable(False, False)
+        dlg.configure(bg=BG)
+        dlg.grab_set()
+
+        # Header strip
+        hdr = tk.Frame(dlg, bg=HEADER_BG, pady=16)
+        hdr.pack(fill="x")
+        tk.Label(
+            hdr,
+            text="University Timetable Automation",
+            font=(FONT, 16, "bold"),
+            bg=HEADER_BG,
+            fg=HEADER_FG,
+        ).pack()
+        tk.Label(
+            hdr, text=f"v{APP_VERSION}", font=(FONT, FONT_SMALL), bg=HEADER_BG, fg=HEADER_SUB
+        ).pack(pady=(2, 0))
+
+        body = tk.Frame(dlg, bg=BG, padx=28, pady=16)
+        body.pack(fill="both")
+
+        def _row(label: str, value: str):
+            row = tk.Frame(body, bg=BG)
+            row.pack(fill="x", pady=4)
+            tk.Label(
+                row,
+                text=label,
+                font=(FONT, FONT_SMALL, "bold"),
+                bg=BG,
+                fg=TEXT_DIM,
+                width=18,
+                anchor="w",
+            ).pack(side="left")
+            tk.Label(row, text=value, font=(FONT, FONT_SMALL), bg=BG, fg=TEXT, anchor="w").pack(
+                side="left"
+            )
+
+        _row(t("info_author", lang) + ":", AUTHOR)
+        _row(t("info_license", lang) + ":", t("info_license_value", lang))
+        _row(t("info_version", lang) + ":", APP_VERSION)
+
+        tk.Frame(body, bg=BORDER, height=1).pack(fill="x", pady=12)
+
+        tk.Label(
+            body,
+            text=t("info_contributions", lang),
+            font=(FONT, FONT_SMALL),
+            bg=BG,
+            fg=TEXT,
+            wraplength=340,
+            justify="center",
+        ).pack()
+
+        ttk.Button(
+            body,
+            text=t("info_open_github", lang),
+            style="Info.TButton",
+            cursor="hand2",
+            command=lambda: webbrowser.open(GITHUB_REPO),
+        ).pack(pady=(14, 4))
+
+    def _on_menu_check_updates(self) -> None:
+        """
+        Checks GitHub Releases API for a newer version and shows a dialog
+        with the result. Runs the network call in a background thread to
+        avoid blocking the UI.
+        """
+        lang = settings.language
+        self._set_status(t("update_checking", lang))
+        threading.Thread(target=self._thread_check_updates, daemon=True).start()
+
+    # ── Thread: update check ──────────────────────────────────────────────────
+
+    def _thread_check_updates(self) -> None:
+        """
+        Background thread: queries the GitHub Releases API and schedules
+        the result dialog on the main thread.
+        """
+        import webbrowser
+
+        api_url = (
+            f"https://api.github.com/repos/Luxauram/university-timetable-automation/releases/latest"
+        )
+        try:
+            resp = requests.get(api_url, timeout=10, headers={"User-Agent": USER_AGENT})
+            resp.raise_for_status()
+            latest = resp.json().get("tag_name", "").lstrip("v")
+            self.after(0, self._show_update_result, latest)
+        except Exception:
+            self.after(0, self._show_update_error)
+
+    def _show_update_result(self, latest: str) -> None:
+        """
+        Main-thread callback: shows a dialog reporting whether an update is
+        available. If yes, offers a button to open the releases page.
+
+        @param latest: Latest version string from the GitHub API (e.g. "1.1.0").
+        """
+        import webbrowser
+
+        lang = settings.language
+        current = APP_VERSION
+
+        self._set_status(t("status_ready", lang))
+
+        if latest and latest != current:
+            msg = t("update_available", lang, latest=latest, current=current)
+            dlg = tk.Toplevel(self)
+            dlg.title(t("update_title", lang))
+            dlg.resizable(False, False)
+            dlg.configure(bg=BG, padx=24, pady=20)
+            dlg.grab_set()
+            tk.Label(dlg, text=msg, font=(FONT, FONT_SIZE), bg=BG, fg=TEXT, justify="center").pack(
+                pady=(0, 16)
+            )
+            btn_row = tk.Frame(dlg, bg=BG)
+            btn_row.pack()
+            ttk.Button(
+                btn_row,
+                text=t("update_download", lang),
+                style="Confirm.TButton",
+                cursor="hand2",
+                command=lambda: (
+                    webbrowser.open(f"{GITHUB_REPO}/releases/latest"),
+                    dlg.destroy(),
+                ),
+            ).pack(side="left", padx=(0, 8))
+            ttk.Button(
+                btn_row, text="OK", style="Neutral.TButton", cursor="hand2", command=dlg.destroy
+            ).pack(side="left")
+        else:
+            messagebox.showinfo(
+                t("update_title", lang),
+                t("update_up_to_date", lang, version=current),
+            )
+
+    def _show_update_error(self) -> None:
+        """Main-thread callback: shows an error dialog if the update check failed."""
+        lang = settings.language
+        self._set_status(t("status_ready", lang))
+        messagebox.showwarning(t("update_title", lang), t("update_error", lang))
 
 
 # ── Module-level private helpers ──────────────────────────────────────────────
