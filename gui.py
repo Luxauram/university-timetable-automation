@@ -414,12 +414,14 @@ class App(tk.Tk):
 
     def _build_header(self) -> None:
         """
-        Builds the dark top banner with the application title and subtitle,
-        using the active language from settings.
+        Builds the dark top banner with the application title, subtitle,
+        and a small '?' help button that opens the How it works dialog.
         """
         lang = settings.language
         hdr = tk.Frame(self, bg=HEADER_BG, pady=20)
         hdr.pack(fill="x")
+
+        # Title + subtitle centred
         tk.Label(
             hdr,
             text=t("header_title", lang),
@@ -434,6 +436,20 @@ class App(tk.Tk):
             bg=HEADER_BG,
             fg=HEADER_SUB,
         ).pack(pady=(3, 0))
+
+        # '?' button
+        help_btn = tk.Label(
+            hdr,
+            text=" ? ",
+            font=(FONT, FONT_SMALL, "bold"),
+            bg=HEADER_BG,
+            fg=HEADER_SUB,
+            cursor="hand2",
+        )
+        help_btn.place(relx=1.0, rely=0.0, anchor="ne", x=-14, y=10)
+        help_btn.bind("<Button-1>", lambda _: self._on_help())
+        help_btn.bind("<Enter>", lambda _: help_btn.config(fg=HEADER_FG))
+        help_btn.bind("<Leave>", lambda _: help_btn.config(fg=HEADER_SUB))
 
     def _build_card_corso(self, parent: tk.Widget) -> None:
         """
@@ -971,6 +987,76 @@ class App(tk.Tk):
             self._render_lista()
 
         self._set_status(t("settings_saved", settings.language))
+
+    def _on_help(self) -> None:
+        """
+        Opens the 'How it works' dialog with step-by-step usage instructions.
+        Content is fully bilingual via i18n.py.
+        """
+        lang = settings.language
+
+        dlg = tk.Toplevel(self)
+        dlg.title(t("help_title", lang))
+        dlg.resizable(False, False)
+        dlg.configure(bg=BG)
+        dlg.grab_set()
+
+        # Header strip
+        hdr = tk.Frame(dlg, bg=HEADER_BG, pady=14)
+        hdr.pack(fill="x")
+        tk.Label(
+            hdr, text=t("help_title", lang), font=(FONT, 15, "bold"), bg=HEADER_BG, fg=HEADER_FG
+        ).pack()
+
+        body = tk.Frame(dlg, bg=BG, padx=28, pady=16)
+        body.pack(fill="both")
+
+        steps = [
+            ("help_step1_title", "help_step1_body"),
+            ("help_step2_title", "help_step2_body"),
+            ("help_step3_title", "help_step3_body"),
+            ("help_step4_title", "help_step4_body"),
+        ]
+
+        for title_key, body_key in steps:
+            tk.Label(
+                body,
+                text=t(title_key, lang),
+                font=(FONT, FONT_SIZE, "bold"),
+                bg=BG,
+                fg=TEXT,
+                anchor="w",
+            ).pack(fill="x", pady=(10, 2))
+            tk.Label(
+                body,
+                text=t(body_key, lang),
+                font=(FONT, FONT_SMALL),
+                bg=BG,
+                fg=TEXT_DIM,
+                anchor="w",
+                wraplength=400,
+                justify="left",
+            ).pack(fill="x")
+
+        tk.Frame(body, bg=BORDER, height=1).pack(fill="x", pady=(16, 8))
+
+        tk.Label(
+            body,
+            text=t("help_tip", lang),
+            font=(FONT, FONT_SMALL, "italic"),
+            bg=BG,
+            fg=TEXT_DIM,
+            wraplength=400,
+            justify="left",
+        ).pack(fill="x", pady=(0, 12))
+
+        ttk.Button(
+            body,
+            text=t("help_close", lang),
+            style="Neutral.TButton",
+            cursor="hand2",
+            command=dlg.destroy,
+        ).pack(pady=(0, 4))
 
     def _on_menu_open_folder(self) -> None:
         """Opens the current destination folder in the OS file manager."""

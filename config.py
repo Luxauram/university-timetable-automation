@@ -18,7 +18,7 @@ from courses import CORSI, BASE_STRAPI
 
 # ── Application identity ──────────────────────────────────────────────────────
 
-APP_VERSION: str = "1.0.1"
+APP_VERSION: str = "1.1.0"
 GITHUB_REPO: str = "https://github.com/Luxauram/university-timetable-automation"
 AUTHOR: str = "Luxauram"
 

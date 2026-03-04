@@ -80,6 +80,37 @@ _STRINGS: dict[str, dict[str, str]] = {
         "en": "Could not check for updates.\nPlease check your internet connection.",
     },
     "update_title": {"it": "Aggiornamenti", "en": "Updates"},
+    # ── Help dialog ───────────────────────────────────────────────────────────
+    "help_tooltip": {"it": "Come funziona", "en": "How it works"},
+    "help_title": {"it": "Come funziona l'app", "en": "How the app works"},
+    "help_step1_title": {"it": "1 — Seleziona il corso", "en": "1 — Select a course"},
+    "help_step1_body": {
+        "it": "Scegli il corso di laurea dal menu a tendina e premi «Carica orari» per recuperare tutti i PDF disponibili.",
+        "en": "Choose your degree course from the dropdown and press «Load timetables» to fetch all available PDFs.",
+    },
+    "help_step2_title": {"it": "2 — Scegli dove salvare", "en": "2 — Choose where to save"},
+    "help_step2_body": {
+        "it": "Il campo «Salva in» mostra la cartella di destinazione. Premi «Sfoglia» per cambiarla. I file verranno salvati nelle sottocartelle PDF/ e PPTX/.",
+        "en": "The «Save to» field shows the destination folder. Press «Browse» to change it. Files are saved in PDF/ and PPTX/ subfolders.",
+    },
+    "help_step3_title": {"it": "3 — Seleziona e scarica", "en": "3 — Select and download"},
+    "help_step3_body": {
+        "it": "Spunta i PDF che vuoi scaricare dalla lista, oppure usa «Seleziona tutti». Attiva la conversione PPTX se vuoi anche il PowerPoint. Premi «Scarica».",
+        "en": "Check the PDFs you want from the list, or use «Select all». Enable PPTX conversion if you also want PowerPoint files. Press «Download».",
+    },
+    "help_step4_title": {
+        "it": "4 — Link esterni (opzionale)",
+        "en": "4 — External links (optional)",
+    },
+    "help_step4_body": {
+        "it": "Puoi aggiungere qualsiasi PDF da URL esterno incollando il link nel campo apposito. Verrà aggiunto alla lista e scaricato insieme agli altri.",
+        "en": "You can add any PDF from an external URL by pasting the link in the dedicated field. It will be added to the list and downloaded with the others.",
+    },
+    "help_tip": {
+        "it": "💡 Le impostazioni (qualità PPTX, lingua, cartella automatica) si trovano nel menu Impostazioni.",
+        "en": "💡 Settings (PPTX quality, language, auto-open folder) are in the Settings menu.",
+    },
+    "help_close": {"it": "Chiudi", "en": "Close"},
     # ── Main UI ───────────────────────────────────────────────────────────────
     "header_title": {"it": "Orari Lezioni", "en": "Course Timetables"},
     "header_subtitle": {
