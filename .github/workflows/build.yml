@@ -131,14 +131,13 @@ jobs:
       - name: Read app version from config.py
         id: version
         run: |
-          VERSION=$(python3 -c "
-          import re
-          content = open('config.py').read()
-          m = re.search(r'APP_VERSION\s*=\s*[\"\']([\w.]+)[\"\']', content)
-          print('v' + m.group(1) if m else 'v0.0.0')
-          ")
-          echo "tag=$VERSION" >> $GITHUB_OUTPUT
-          echo "Detected version: $VERSION"
+          VERSION=$(grep -oP 'APP_VERSION\s*:\s*str\s*=\s*"\K[^"]+' config.py)
+          if [ -z "$VERSION" ]; then
+            echo "ERROR: could not read APP_VERSION from config.py" >&2
+            exit 1
+          fi
+          echo "tag=v${VERSION}" >> $GITHUB_OUTPUT
+          echo "Detected version: v${VERSION}"
 
       - name: Download Windows build
         uses: actions/download-artifact@v4
