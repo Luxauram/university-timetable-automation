@@ -35,17 +35,41 @@ CORSI: dict[str, str] = {
     "UNIMOL — Triennale — Informatica": (
         "https://www3.unimol.it/dipartimenti/bioscienze-e-territorio/corso/informatica_lezioni"
     ),
-    "UNIMOL — Triennale — Scienze Turistiche": (
-        "https://www3.unimol.it/dipartimenti/bioscienze-e-territorio/corso/scienze_turistiche_lezioni"
+    "UNIMOL — Triennale — Ingegneria Sostenibilità Sicurezza Costruzioni": (
+        "https://www3.unimol.it/dipartimenti/bioscienze-e-territorio/corso/Ingegneria_sostenibilita_sicurezza_costruzioni_lezioni"
+    ),
+    "UNIMOL — Triennale — Scienze Biologiche": (
+        "https://www3.unimol.it/dipartimenti/bioscienze-e-territorio/corso/scienze_biologiche_lezioni"
+    ),
+    "UNIMOL — Triennale — Scienze Culture Cibo": (
+        "https://www3.unimol.it/dipartimenti/agricoltura-ambiente-e-alimenti/corso/scienze_culture_cibo_lezioni"
     ),
     "UNIMOL — Triennale — Scienze del Turismo Ambientale": (
         "https://www3.unimol.it/dipartimenti/bioscienze-e-territorio/corso/scienze_del_turismo_ambientale_lezioni"
     ),
+    "UNIMOL — Triennale — Scienze Turistiche": (
+        "https://www3.unimol.it/dipartimenti/bioscienze-e-territorio/corso/scienze_turistiche_lezioni"
+    ),
     # ── Magistrali ────────────────────────────────────────────────────────────
+    "UNIMOL — Magistrale — Biologia": (
+        "https://www3.unimol.it/dipartimenti/bioscienze-e-territorio/corso/biologia_lezioni"
+    ),
+    "UNIMOL — Magistrale — Ingegneria Civile": (
+        "https://www3.unimol.it/dipartimenti/bioscienze-e-territorio/corso/ingegneria_civile_lezioni"
+    ),
     "UNIMOL — Magistrale — Management del Turismo e dei Beni Culturali": (
         "https://www3.unimol.it/dipartimenti/bioscienze-e-territorio/corso/management_turismo_beni_culturali_lezioni"
     ),
+    "UNIMOL — Magistrale — Nutrizione Biosicurezza Alimenti": (
+        "https://www3.unimol.it/dipartimenti/agricoltura-ambiente-e-alimenti/corso/nutrizione_biosicurezza_alimenti_lezioni"
+    ),
     "UNIMOL — Magistrale — Progettazione e Gestione dei Sistemi Turistici Patrimoniali": (
         "https://www3.unimol.it/dipartimenti/bioscienze-e-territorio/corso/progettazione_e_gestione_dei_sistemi_turistici_patrimoniali_lezioni"
+    ),
+    "UNIMOL — Magistrale — Scienze Tecnologie Forestali Ambientali": (
+        "https://www3.unimol.it/dipartimenti/agricoltura-ambiente-e-alimenti/corso/scienze_tecnologie_forestali_ambientali_lezioni"
+    ),
+    "UNIMOL — Magistrale — Sicurezza Sistemi Software": (
+        "https://www3.unimol.it/dipartimenti/bioscienze-e-territorio/corso/sicurezza_sistemi_software_lezioni"
     ),
 }
